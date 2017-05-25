@@ -6,6 +6,7 @@ namespace VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\RabbitMq\Produ
 
 use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
 use OldSound\RabbitMqBundle\RabbitMq\Producer;
+use Psr\Log\LoggerInterface;
 use VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection\Connection;
 
 class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\TestCase
@@ -134,10 +135,13 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 	private function getConnection(): Connection
 	{
 		$connectionFactory = new ConnectionFactory([]);
-		return $connectionFactory->createConnection([
+		$connection = $connectionFactory->createConnection([
 			'driver' => 'pdo_sqlite',
 			'wrapperClass' => Connection::class,
 		]);
+		$connection->setLogger($this->createMock(LoggerInterface::class));
+
+		return $connection;
 	}
 
 }

@@ -15,6 +15,7 @@ class RabbitMqDatabaseTransactionProducerExtension
 	const ALIAS = 'rabbit_mq_database_transaction_producer';
 
 	const CONTAINER_SERVICE_DATABASE_CONNECTION = 'database_connection';
+	const CONTAINER_SERVICE_LOGGER = 'logger';
 
 	const DOCTRINE_EXTENSION_ALIAS = 'doctrine';
 

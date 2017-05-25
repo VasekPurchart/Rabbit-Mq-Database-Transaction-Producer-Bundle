@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection;
 
 use Doctrine\DBAL\Driver\PDOSqlite\Driver as PDOSqliteDriver;
+use Psr\Log\LoggerInterface;
 
 class ConnectionTest extends \PHPUnit\Framework\TestCase
 {
@@ -12,6 +13,12 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 	public function testSingleCallbackIsCalledOnlyOnce()
 	{
 		$connection = $this->getConnection();
+
+		$loggerMock = $this->getLoggerMock();
+		$loggerMock
+			->expects($this->never())
+			->method('error');
+		$connection->setLogger($loggerMock);
 
 		$mock = $this->getCallbacksMock();
 		$mock
@@ -35,6 +42,12 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 	{
 		$connection = $this->getConnection();
 
+		$loggerMock = $this->getLoggerMock();
+		$loggerMock
+			->expects($this->never())
+			->method('error');
+		$connection->setLogger($loggerMock);
+
 		$mock = $this->getCallbacksMock();
 		$mock
 			->expects($this->never())
@@ -56,6 +69,12 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 	public function testMultipleCallbacksAreCalled()
 	{
 		$connection = $this->getConnection();
+
+		$loggerMock = $this->getLoggerMock();
+		$loggerMock
+			->expects($this->never())
+			->method('error');
+		$connection->setLogger($loggerMock);
 
 		$mock = $this->getCallbacksMock();
 		$mock
@@ -85,6 +104,12 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 	{
 		$connection = $this->getConnection();
 
+		$loggerMock = $this->getLoggerMock();
+		$loggerMock
+			->expects($this->never())
+			->method('error');
+		$connection->setLogger($loggerMock);
+
 		$mock = $this->getCallbacksMock();
 		$mock
 			->expects($this->never())
@@ -113,6 +138,12 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 	{
 		$connection = $this->getConnection();
 
+		$loggerMock = $this->getLoggerMock();
+		$loggerMock
+			->expects($this->never())
+			->method('error');
+		$connection->setLogger($loggerMock);
+
 		$mock = $this->getCallbacksMock();
 		$mock
 			->expects($this->never())
@@ -140,6 +171,72 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 		$connection->commit();
 	}
 
+	public function testExceptionInCallbackIsProperlyHandled()
+	{
+		$connection = $this->getConnection();
+
+		$loggerMock = $this->getLoggerMock();
+		$loggerMock
+			->expects($this->once())
+			->method('error')
+			->with(
+				$this->callback(function ($message): bool {
+					return strpos($message, 'callback failed') !== false;
+				}),
+				$this->callback(function ($data): bool {
+					return ($data['exception'] instanceof \Exception)
+						&& $data['exception']->getMessage() === 'callback failed';
+				})
+			);
+		$connection->setLogger($loggerMock);
+
+		$connection->addAfterCommitCallback(function () {
+			throw new \Exception('callback failed');
+		});
+
+		$connection->beginTransaction();
+		$connection->commit();
+
+		$this->assertTrue(true, 'callback exception was properly caught');
+	}
+
+	public function testMissingLogger()
+	{
+		$connection = $this->getConnection();
+
+		$mock = $this->getCallbacksMock();
+		$mock
+			->expects($this->never())
+			->method('callback1');
+
+		$this->expectException(
+			\VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection\ConnectionRequiresLoggerException::class
+		);
+
+		$connection->addAfterCommitCallback(function () use ($mock) {
+			$mock->callback1();
+		});
+
+		$this->fail();
+	}
+
+	public function testSetLoggerOnlyOnce()
+	{
+		$connection = $this->getConnection();
+
+		$loggerMock = $this->getLoggerMock();
+		$loggerMock
+			->expects($this->never())
+			->method('error');
+		$connection->setLogger($loggerMock);
+
+		$this->expectException(
+			\VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection\ConnectionLoggerAlreadyInitializedException::class
+		);
+
+		$connection->setLogger($loggerMock);
+	}
+
 	private function getConnection(): Connection
 	{
 		return new Connection(['path' => ':memory:'], new PDOSqliteDriver());
@@ -151,6 +248,14 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 	private function getCallbacksMock(): DummyCallbacks
 	{
 		return $this->createMock(DummyCallbacks::class);
+	}
+
+	/**
+	 * @return \Psr\Log\LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+	 */
+	private function getLoggerMock(): LoggerInterface
+	{
+		return $this->createMock(LoggerInterface::class);
 	}
 
 }
