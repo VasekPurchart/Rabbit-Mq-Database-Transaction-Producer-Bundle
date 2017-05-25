@@ -1,0 +1,12 @@
+{
+	"name": "vasek-purchart/rabbit-mq-database-transaction-producer-bundle",
+	"description": "Publish messages to RabbitMQ producer when database transaction was committed",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Vašek Purchart",
+			"email": "me@vasekpurchart.cz",
+			"homepage": "http://vasekpurchart.cz"
+		}
+	]
+}
