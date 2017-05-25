@@ -14,6 +14,8 @@ class RabbitMqDatabaseTransactionProducerExtension
 
 	const ALIAS = 'rabbit_mq_database_transaction_producer';
 
+	const CONTAINER_SERVICE_DATABASE_CONNECTION = 'database_connection';
+
 	const DOCTRINE_EXTENSION_ALIAS = 'doctrine';
 
 	public function prepend(ContainerBuilder $container)
