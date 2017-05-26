@@ -1,0 +1,3 @@
+services:
+    rabbit_mq_database_transaction_producer_bundle.database_connection: '@database_connection'
+    rabbit_mq_database_transaction_producer_bundle.logger: '@logger'

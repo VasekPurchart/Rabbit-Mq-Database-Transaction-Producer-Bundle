@@ -4,7 +4,9 @@ declare(strict_types = 1);
 
 namespace VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\DependencyInjection;
 
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection\Connection;
 
 class RabbitMqDatabaseTransactionProducerExtension
@@ -14,8 +16,8 @@ class RabbitMqDatabaseTransactionProducerExtension
 
 	const ALIAS = 'rabbit_mq_database_transaction_producer';
 
-	const CONTAINER_SERVICE_DATABASE_CONNECTION = 'database_connection';
-	const CONTAINER_SERVICE_LOGGER = 'logger';
+	const CONTAINER_SERVICE_DATABASE_CONNECTION = 'rabbit_mq_database_transaction_producer_bundle.database_connection';
+	const CONTAINER_SERVICE_LOGGER = 'rabbit_mq_database_transaction_producer_bundle.logger';
 
 	const DOCTRINE_EXTENSION_ALIAS = 'doctrine';
 
@@ -37,7 +39,8 @@ class RabbitMqDatabaseTransactionProducerExtension
 	 */
 	public function load(array $configs, ContainerBuilder $container)
 	{
-		// ...
+		$loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/config'));
+		$loader->load('services.yml');
 	}
 
 	public function getAlias(): string
