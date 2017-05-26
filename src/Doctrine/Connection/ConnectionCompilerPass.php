@@ -13,7 +13,11 @@ class ConnectionCompilerPass implements \Symfony\Component\DependencyInjection\C
 
 	public function process(ContainerBuilder $container)
 	{
-		if (!$container->has(RabbitMqDatabaseTransactionProducerExtension::CONTAINER_SERVICE_DATABASE_CONNECTION)) {
+		if (
+			!$container->hasParameter(RabbitMqDatabaseTransactionProducerExtension::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS)
+			|| $container->getParameter(RabbitMqDatabaseTransactionProducerExtension::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS)
+			|| !$container->has(RabbitMqDatabaseTransactionProducerExtension::CONTAINER_SERVICE_DATABASE_CONNECTION)
+		) {
 			return;
 		}
 

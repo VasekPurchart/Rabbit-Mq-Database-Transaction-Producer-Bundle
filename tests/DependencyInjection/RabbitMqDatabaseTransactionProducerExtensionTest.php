@@ -55,9 +55,24 @@ class RabbitMqDatabaseTransactionProducerExtensionTest extends \Matthias\Symfony
 	{
 		$this->loadExtensions();
 
-		$this->compile();
+		$this->assertContainerBuilderHasParameter(
+			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS,
+			false
+		);
+	}
 
-		$this->assertTrue(true);
+	public function testTurnOffDefaultConnectionIntegration()
+	{
+		$this->loadExtensions([
+			'rabbit_mq_database_transaction_producer' => [
+				'custom_connection_class' => true,
+			],
+		]);
+
+		$this->assertContainerBuilderHasParameter(
+			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS,
+			true
+		);
 	}
 
 	/**

@@ -24,6 +24,10 @@ class ConnectionCompilerPassTest extends \Matthias\SymfonyDependencyInjectionTes
 			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_SERVICE_DATABASE_CONNECTION,
 			$connectionDefinition
 		);
+		$this->setParameter(
+			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS,
+			false
+		);
 
 		$this->compile();
 
@@ -40,6 +44,32 @@ class ConnectionCompilerPassTest extends \Matthias\SymfonyDependencyInjectionTes
 			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_SERVICE_LOGGER,
 			$setLoggerCall[1][0]->__toString()
 		);
+	}
+
+	public function testDoNothingWhenCustomConnectionClassIsSpecified()
+	{
+		$connectionDefinition = new Definition(Connection::class);
+		$this->setDefinition(
+			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_SERVICE_DATABASE_CONNECTION,
+			$connectionDefinition
+		);
+		$this->setParameter(
+			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS,
+			true
+		);
+
+		$this->compile();
+
+		$this->assertContainerBuilderHasService(
+			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_SERVICE_DATABASE_CONNECTION,
+			Connection::class
+		);
+		$methodCalls = $this->container->findDefinition(
+			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_SERVICE_DATABASE_CONNECTION
+		)->getMethodCalls();
+		foreach ($methodCalls as $methodCall) {
+			$this->assertNotSame('setLogger', $methodCall[0]);
+		}
 	}
 
 }
