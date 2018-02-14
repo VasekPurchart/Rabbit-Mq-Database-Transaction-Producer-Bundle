@@ -34,11 +34,12 @@ class DatabaseTransactionProducer implements \OldSound\RabbitMqBundle\RabbitMq\P
 	{
 		if (!$this->databaseConnection->isTransactionActive()) {
 			$this->wrappedProducer->publish($messageBody, $routingKey, $additionalProperties);
-		}
+		} else {
 
-		$this->databaseConnection->addAfterCommitCallback(function () use ($messageBody, $routingKey, $additionalProperties) {
-			$this->wrappedProducer->publish($messageBody, $routingKey, $additionalProperties);
-		});
+			$this->databaseConnection->addAfterCommitCallback(function () use ($messageBody, $routingKey, $additionalProperties) {
+				$this->wrappedProducer->publish($messageBody, $routingKey, $additionalProperties);
+			});
+		}
 	}
 
 }
