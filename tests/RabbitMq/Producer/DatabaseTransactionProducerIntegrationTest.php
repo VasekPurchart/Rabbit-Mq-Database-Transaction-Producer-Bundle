@@ -16,28 +16,51 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 	{
 		$connection = $this->getConnection();
 
-		$message = 'message';
-		$wasAlreadyPublished = false;
+		$message1 = 'message1';
+		$message2 = 'message2';
+		$message1PublishCount = 0;
+		$message2PublishCount = 0;
 
 		$originalProducer = $this
 			->getMockBuilder(Producer::class)
 			->disableOriginalConstructor()
 			->getMock();
 		$originalProducer
-			->expects($this->once())
+			->expects($this->any())
 			->method('publish')
-			->with($this->callback(function ($receivedMessage) use ($message, &$wasAlreadyPublished) {
-				$wasAlreadyPublished = true;
+			->with($this->callback(function ($receivedMessage) use ($message1, &$message1PublishCount, $message2, &$message2PublishCount) {
+				if ($receivedMessage === $message1) {
+					$message1PublishCount++;
 
-				return $receivedMessage === $message;
+					return $receivedMessage === $message1;
+				}
+				if ($receivedMessage === $message2) {
+					$message2PublishCount++;
+
+					return $receivedMessage === $message2;
+				}
 			}));
 
 		$databaseTransactionProducer = new DatabaseTransactionProducer($originalProducer, $connection);
 
 		$connection->query('SELECT 1');
-		$this->assertFalse($wasAlreadyPublished);
-		$databaseTransactionProducer->publish($message);
-		$this->assertTrue($wasAlreadyPublished);
+		$this->assertSame(0, $message1PublishCount);
+		$databaseTransactionProducer->publish($message1);
+		$this->assertSame(1, $message1PublishCount);
+
+		$connection->transactional(function () use (
+			$connection,
+			$databaseTransactionProducer,
+			$message2,
+			&$message2PublishCount
+		) {
+			$connection->query('SELECT 1');
+			$this->assertSame(0, $message2PublishCount);
+			$databaseTransactionProducer->publish($message2);
+			$this->assertSame(0, $message2PublishCount);
+		});
+		$this->assertSame(1, $message2PublishCount);
+		$this->assertSame(1, $message1PublishCount);
 	}
 
 	public function testMessageIsSentAfterTransaction()
