@@ -34,6 +34,7 @@ class DatabaseTransactionProducer implements \OldSound\RabbitMqBundle\RabbitMq\P
 	{
 		if (!$this->databaseConnection->isTransactionActive()) {
 			$this->wrappedProducer->publish($messageBody, $routingKey, $additionalProperties);
+			return;
 		}
 
 		$this->databaseConnection->addAfterCommitCallback(function () use ($messageBody, $routingKey, $additionalProperties) {
