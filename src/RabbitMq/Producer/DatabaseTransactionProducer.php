@@ -26,6 +26,8 @@ class DatabaseTransactionProducer implements \OldSound\RabbitMqBundle\RabbitMq\P
 	}
 
 	/**
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
+	 *
 	 * @param string $messageBody
 	 * @param string $routingKey
 	 * @param mixed[] $additionalProperties
