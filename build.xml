@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="Consistence Sentry Symfony Bundle" default="build">
+<project name="RabbitMQ Database Transaction Producer Bundle" default="build">
 
 	<property name="path.build" value="${project.basedir}/build"/>
 	<property name="path.build.properties.local" value="${path.build}/build.local.properties"/>
