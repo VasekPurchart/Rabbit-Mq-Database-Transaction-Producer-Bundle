@@ -12,7 +12,7 @@ use VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection\
 class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\TestCase
 {
 
-	public function testWithoutTransactionSendMessageImmediately()
+	public function testWithoutTransactionSendMessageImmediately(): void
 	{
 		$connection = $this->getConnection();
 
@@ -40,7 +40,7 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 		$this->assertTrue($wasAlreadyPublished);
 	}
 
-	public function testMessageIsSentAfterTransaction()
+	public function testMessageIsSentAfterTransaction(): void
 	{
 		$connection = $this->getConnection();
 
@@ -68,7 +68,7 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 			$databaseTransactionProducer,
 			$message,
 			&$wasAlreadyPublished
-		) {
+		): void {
 			$connection->query('SELECT 1');
 			$this->assertFalse($wasAlreadyPublished);
 			$databaseTransactionProducer->publish($message);
@@ -77,7 +77,7 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 		$this->assertTrue($wasAlreadyPublished);
 	}
 
-	public function testMessageIsNeverSentIfTransactionIsNotCompleted()
+	public function testMessageIsNeverSentIfTransactionIsNotCompleted(): void
 	{
 		$connection = $this->getConnection();
 
@@ -98,7 +98,7 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 		$databaseTransactionProducer->publish($message);
 	}
 
-	public function testMessageIsThrownAwayIfTransactionWasRolledBack()
+	public function testMessageIsThrownAwayIfTransactionWasRolledBack(): void
 	{
 		$connection = $this->getConnection();
 

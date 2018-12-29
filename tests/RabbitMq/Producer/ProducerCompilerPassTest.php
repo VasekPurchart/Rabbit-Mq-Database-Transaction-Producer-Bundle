@@ -13,12 +13,12 @@ use VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\DependencyInjection\
 class ProducerCompilerPassTest extends \Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractCompilerPassTestCase
 {
 
-	protected function registerCompilerPass(ContainerBuilder $container)
+	protected function registerCompilerPass(ContainerBuilder $container): void
 	{
 		$container->addCompilerPass(new ProducerCompilerPass());
 	}
 
-	public function testWrapProducersWithDatabaseTransactionProducer()
+	public function testWrapProducersWithDatabaseTransactionProducer(): void
 	{
 		$producerDefinition = new Definition(Producer::class);
 		$producerDefinition->addTag(ProducerCompilerPass::RABBIT_MQ_EXTENSION_PRODUCER_TAG);

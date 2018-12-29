@@ -12,7 +12,7 @@ use VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection\
 class RabbitMqDatabaseTransactionProducerExtensionTest extends \Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractExtensionTestCase
 {
 
-	public function setUp()
+	public function setUp(): void
 	{
 		parent::setUp();
 		$this->setParameter('kernel.debug', true);
@@ -21,7 +21,7 @@ class RabbitMqDatabaseTransactionProducerExtensionTest extends \Matthias\Symfony
 	/**
 	 * @return \Symfony\Component\DependencyInjection\Extension\ExtensionInterface[]
 	 */
-	protected function getContainerExtensions()
+	protected function getContainerExtensions(): array
 	{
 		return [
 			new DoctrineExtension(),
@@ -29,7 +29,7 @@ class RabbitMqDatabaseTransactionProducerExtensionTest extends \Matthias\Symfony
 		];
 	}
 
-	public function testDependsOnDoctrineBundle()
+	public function testDependsOnDoctrineBundle(): void
 	{
 		$containerBuilder = new ContainerBuilder();
 		$extension = new RabbitMqDatabaseTransactionProducerExtension();
@@ -39,7 +39,7 @@ class RabbitMqDatabaseTransactionProducerExtensionTest extends \Matthias\Symfony
 		$extension->prepend($containerBuilder);
 	}
 
-	public function testRegisterCustomConnectionClass()
+	public function testRegisterCustomConnectionClass(): void
 	{
 		$this->loadExtensions();
 
@@ -51,7 +51,7 @@ class RabbitMqDatabaseTransactionProducerExtensionTest extends \Matthias\Symfony
 		$this->assertSame(Connection::class, $doctrineConfig[0]['dbal']['wrapper_class']);
 	}
 
-	public function testLoadExtension()
+	public function testLoadExtension(): void
 	{
 		$this->loadExtensions();
 
@@ -61,7 +61,7 @@ class RabbitMqDatabaseTransactionProducerExtensionTest extends \Matthias\Symfony
 		);
 	}
 
-	public function testTurnOffDefaultConnectionIntegration()
+	public function testTurnOffDefaultConnectionIntegration(): void
 	{
 		$this->loadExtensions([
 			'rabbit_mq_database_transaction_producer' => [
@@ -78,7 +78,7 @@ class RabbitMqDatabaseTransactionProducerExtensionTest extends \Matthias\Symfony
 	/**
 	 * @param mixed[] $configuration format: extensionAlias(string) => configuration(mixed[])
 	 */
-	private function loadExtensions(array $configuration = [])
+	private function loadExtensions(array $configuration = []): void
 	{
 		$configurations = [];
 		foreach ($this->container->getExtensions() as $extensionAlias => $extension) {

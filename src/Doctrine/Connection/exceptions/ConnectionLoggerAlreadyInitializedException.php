@@ -7,7 +7,7 @@ namespace VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Conne
 class ConnectionLoggerAlreadyInitializedException extends \Exception
 {
 
-	public function __construct(\Throwable $previous = null)
+	public function __construct(?\Throwable $previous = null)
 	{
 		parent::__construct('Logger has been already initialized', 0, $previous);
 	}

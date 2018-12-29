@@ -11,7 +11,7 @@ use VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\DependencyInjection\
 class ConnectionCompilerPass implements \Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface
 {
 
-	public function process(ContainerBuilder $container)
+	public function process(ContainerBuilder $container): void
 	{
 		if (
 			!$container->hasParameter(RabbitMqDatabaseTransactionProducerExtension::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS)

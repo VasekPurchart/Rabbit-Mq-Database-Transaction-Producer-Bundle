@@ -7,7 +7,7 @@ namespace VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Conne
 class ConnectionRequiresLoggerException extends \Exception
 {
 
-	public function __construct(\Throwable $previous = null)
+	public function __construct(?\Throwable $previous = null)
 	{
 		parent::__construct('Connection requires logger for logging callback exceptions', 0, $previous);
 	}

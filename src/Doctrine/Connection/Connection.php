@@ -18,7 +18,7 @@ class Connection
 	/** @var \Psr\Log\LoggerInterface */
 	private $logger;
 
-	public function setLogger(LoggerInterface $logger)
+	public function setLogger(LoggerInterface $logger): void
 	{
 		if ($this->logger !== null) {
 			throw new \VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection\ConnectionLoggerAlreadyInitializedException();
@@ -27,7 +27,12 @@ class Connection
 		$this->logger = $logger;
 	}
 
-	public function commit()
+	public function isTransactionActive(): bool
+	{
+		return parent::isTransactionActive();
+	}
+
+	public function commit(): void
 	{
 		parent::commit();
 		if (!$this->isTransactionActive()) {
@@ -53,7 +58,7 @@ class Connection
 		}
 	}
 
-	public function rollBack()
+	public function rollBack(): void
 	{
 		parent::rollBack();
 		if (!$this->isTransactionActive() || $this->isRollbackOnly()) {
@@ -61,7 +66,7 @@ class Connection
 		}
 	}
 
-	public function addAfterCommitCallback(Closure $callback)
+	public function addAfterCommitCallback(Closure $callback): void
 	{
 		if ($this->logger === null) {
 			throw new \VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection\ConnectionRequiresLoggerException();

@@ -7,12 +7,12 @@ namespace VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Conne
 class DummyCallbacks
 {
 
-	public function callback1()
+	public function callback1(): void
 	{
 		// dummy
 	}
 
-	public function callback2()
+	public function callback2(): void
 	{
 		// dummy
 	}

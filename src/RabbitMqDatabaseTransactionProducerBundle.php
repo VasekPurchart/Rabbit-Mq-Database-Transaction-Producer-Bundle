@@ -17,7 +17,7 @@ class RabbitMqDatabaseTransactionProducerBundle extends \Symfony\Component\HttpK
 	 *
 	 * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
 	 */
-	public function build(ContainerBuilder $container)
+	public function build(ContainerBuilder $container): void
 	{
 		parent::build($container);
 

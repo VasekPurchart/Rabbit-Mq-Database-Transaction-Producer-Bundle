@@ -12,9 +12,9 @@ use VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\DependencyInjection\
 class ProducerCompilerPass implements \Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface
 {
 
-	const RABBIT_MQ_EXTENSION_PRODUCER_TAG = 'old_sound_rabbit_mq.producer';
+	public const RABBIT_MQ_EXTENSION_PRODUCER_TAG = 'old_sound_rabbit_mq.producer';
 
-	public function process(ContainerBuilder $container)
+	public function process(ContainerBuilder $container): void
 	{
 		foreach ($container->findTaggedServiceIds(self::RABBIT_MQ_EXTENSION_PRODUCER_TAG) as $id => $attributes) {
 			$originalDefinition = $container->getDefinition($id);

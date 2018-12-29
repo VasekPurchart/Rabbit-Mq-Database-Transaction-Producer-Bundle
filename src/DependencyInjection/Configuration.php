@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 class Configuration implements \Symfony\Component\Config\Definition\ConfigurationInterface
 {
 
-	const PARAMETER_CUSTOM_CONNECTION_CLASS = 'custom_connection_class';
+	public const PARAMETER_CUSTOM_CONNECTION_CLASS = 'custom_connection_class';
 
 	/** @var string */
 	private $rootNode;

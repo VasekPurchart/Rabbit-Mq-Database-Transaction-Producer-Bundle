@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 class ConnectionTest extends \PHPUnit\Framework\TestCase
 {
 
-	public function testSingleCallbackIsCalledOnlyOnce()
+	public function testSingleCallbackIsCalledOnlyOnce(): void
 	{
 		$connection = $this->getConnection();
 
@@ -25,7 +25,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 			->expects($this->once())
 			->method('callback1');
 
-		$connection->addAfterCommitCallback(function () use ($mock) {
+		$connection->addAfterCommitCallback(function () use ($mock): void {
 			$mock->callback1();
 		});
 
@@ -38,7 +38,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 		$connection->commit();
 	}
 
-	public function testSingleCallbackIsNotCalledAfterRollback()
+	public function testSingleCallbackIsNotCalledAfterRollback(): void
 	{
 		$connection = $this->getConnection();
 
@@ -53,7 +53,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 			->expects($this->never())
 			->method('callback1');
 
-		$connection->addAfterCommitCallback(function () use ($mock) {
+		$connection->addAfterCommitCallback(function () use ($mock): void {
 			$mock->callback1();
 		});
 
@@ -66,7 +66,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 		$connection->commit();
 	}
 
-	public function testMultipleCallbacksAreCalled()
+	public function testMultipleCallbacksAreCalled(): void
 	{
 		$connection = $this->getConnection();
 
@@ -84,10 +84,10 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 			->expects($this->once())
 			->method('callback2');
 
-		$connection->addAfterCommitCallback(function () use ($mock) {
+		$connection->addAfterCommitCallback(function () use ($mock): void {
 			$mock->callback1();
 		});
-		$connection->addAfterCommitCallback(function () use ($mock) {
+		$connection->addAfterCommitCallback(function () use ($mock): void {
 			$mock->callback2();
 		});
 
@@ -100,7 +100,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 		$connection->commit();
 	}
 
-	public function testMultipleCallbacksAreNotCalledAfterRollback()
+	public function testMultipleCallbacksAreNotCalledAfterRollback(): void
 	{
 		$connection = $this->getConnection();
 
@@ -118,10 +118,10 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 			->expects($this->never())
 			->method('callback2');
 
-		$connection->addAfterCommitCallback(function () use ($mock) {
+		$connection->addAfterCommitCallback(function () use ($mock): void {
 			$mock->callback1();
 		});
-		$connection->addAfterCommitCallback(function () use ($mock) {
+		$connection->addAfterCommitCallback(function () use ($mock): void {
 			$mock->callback2();
 		});
 
@@ -134,7 +134,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 		$connection->commit();
 	}
 
-	public function testFailedNestedTransactionClearsAfterCommitCallbacks()
+	public function testFailedNestedTransactionClearsAfterCommitCallbacks(): void
 	{
 		$connection = $this->getConnection();
 
@@ -149,7 +149,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 			->expects($this->never())
 			->method('callback1');
 
-		$connection->addAfterCommitCallback(function () use ($mock) {
+		$connection->addAfterCommitCallback(function () use ($mock): void {
 			$mock->callback1();
 		});
 
@@ -171,7 +171,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 		$connection->commit();
 	}
 
-	public function testExceptionInCallbackIsProperlyHandled()
+	public function testExceptionInCallbackIsProperlyHandled(): void
 	{
 		$connection = $this->getConnection();
 
@@ -190,7 +190,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 			);
 		$connection->setLogger($loggerMock);
 
-		$connection->addAfterCommitCallback(function () {
+		$connection->addAfterCommitCallback(function (): void {
 			throw new \Exception('callback failed');
 		});
 
@@ -200,7 +200,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 		$this->assertTrue(true, 'callback exception was properly caught');
 	}
 
-	public function testMissingLogger()
+	public function testMissingLogger(): void
 	{
 		$connection = $this->getConnection();
 
@@ -213,14 +213,14 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 			\VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection\ConnectionRequiresLoggerException::class
 		);
 
-		$connection->addAfterCommitCallback(function () use ($mock) {
+		$connection->addAfterCommitCallback(function () use ($mock): void {
 			$mock->callback1();
 		});
 
 		$this->fail();
 	}
 
-	public function testSetLoggerOnlyOnce()
+	public function testSetLoggerOnlyOnce(): void
 	{
 		$connection = $this->getConnection();
 

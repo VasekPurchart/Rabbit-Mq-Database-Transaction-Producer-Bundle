@@ -9,11 +9,8 @@ use Closure;
 interface AfterCommitCallbacksConnection
 {
 
-	public function addAfterCommitCallback(Closure $callback);
+	public function addAfterCommitCallback(Closure $callback): void;
 
-	/**
-	 * @return bool
-	 */
-	public function isTransactionActive();
+	public function isTransactionActive(): bool;
 
 }

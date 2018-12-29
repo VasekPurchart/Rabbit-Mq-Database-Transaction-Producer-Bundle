@@ -30,14 +30,14 @@ class DatabaseTransactionProducer implements \OldSound\RabbitMqBundle\RabbitMq\P
 	 * @param string $routingKey
 	 * @param mixed[] $additionalProperties
 	 */
-	public function publish($messageBody, $routingKey = '', $additionalProperties = [])
+	public function publish($messageBody, $routingKey = '', $additionalProperties = []): void
 	{
 		if (!$this->databaseConnection->isTransactionActive()) {
 			$this->wrappedProducer->publish($messageBody, $routingKey, $additionalProperties);
 			return;
 		}
 
-		$this->databaseConnection->addAfterCommitCallback(function () use ($messageBody, $routingKey, $additionalProperties) {
+		$this->databaseConnection->addAfterCommitCallback(function () use ($messageBody, $routingKey, $additionalProperties): void {
 			$this->wrappedProducer->publish($messageBody, $routingKey, $additionalProperties);
 		});
 	}

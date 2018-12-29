@@ -12,12 +12,12 @@ use VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\DependencyInjection\
 class ConnectionCompilerPassTest extends \Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractCompilerPassTestCase
 {
 
-	protected function registerCompilerPass(ContainerBuilder $container)
+	protected function registerCompilerPass(ContainerBuilder $container): void
 	{
 		$container->addCompilerPass(new ConnectionCompilerPass());
 	}
 
-	public function testSetLoggerForConnection()
+	public function testSetLoggerForConnection(): void
 	{
 		$connectionDefinition = new Definition(Connection::class);
 		$this->setDefinition(
@@ -46,7 +46,7 @@ class ConnectionCompilerPassTest extends \Matthias\SymfonyDependencyInjectionTes
 		);
 	}
 
-	public function testDoNothingWhenCustomConnectionClassIsSpecified()
+	public function testDoNothingWhenCustomConnectionClassIsSpecified(): void
 	{
 		$connectionDefinition = new Definition(Connection::class);
 		$this->setDefinition(

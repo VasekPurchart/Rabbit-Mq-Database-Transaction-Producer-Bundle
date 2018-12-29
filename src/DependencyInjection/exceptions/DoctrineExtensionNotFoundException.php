@@ -7,7 +7,7 @@ namespace VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\DependencyInje
 class DoctrineExtensionNotFoundException extends \Exception
 {
 
-	public function __construct(\Throwable $previous = null)
+	public function __construct(?\Throwable $previous = null)
 	{
 		parent::__construct('Could not find registered `doctrine` extension', 0, $previous);
 	}
