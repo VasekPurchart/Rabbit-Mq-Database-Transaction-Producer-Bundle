@@ -77,7 +77,7 @@ Configuration
 Configuration structure with listed default values:
 
 ```yaml
-# app/config/config.yml
+# config/packages/rabbit_mq_database_transaction_producer.yaml
 rabbit_mq_database_transaction_producer:
     # Whether custom connection class for DBAL is used in the project, see below for details.
     # When this is false, custom connection class from this bundle is used.
@@ -115,14 +115,11 @@ Install package [`vasek-purchart/rabbit-mq-database-transaction-producer-bundle`
 composer require vasek-purchart/rabbit-mq-database-transaction-producer-bundle
 ```
 
-Register the bundle in your application kernel:
+Register the bundle in your application:
 ```php
-// app/AppKernel.php
-public function registerBundles()
-{
-	return array(
-		// ...
-		new VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\RabbitMqDatabaseTransactionProducerBundle(),
-	);
-}
+// config/bundles.php
+return [
+	// ...
+	VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\RabbitMqDatabaseTransactionProducerBundle::class => ['all' => true],
+];
 ```
