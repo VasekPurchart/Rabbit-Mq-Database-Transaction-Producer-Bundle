@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection;
 
-use Doctrine\DBAL\Driver\PDOSqlite\Driver as PDOSqliteDriver;
+use Doctrine\DBAL\Driver\PDO\SQLite\Driver as PDOSqliteDriver;
 use Psr\Log\LoggerInterface;
 
 class ConnectionTest extends \PHPUnit\Framework\TestCase
