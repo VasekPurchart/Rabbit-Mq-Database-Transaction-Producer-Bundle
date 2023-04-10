@@ -218,7 +218,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 			$mock->callback1();
 		});
 
-		Assert::fail();
+		Assert::fail('Exception expected');
 	}
 
 	public function testSetLoggerOnlyOnce(): void
