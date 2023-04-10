@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection;
 
+use PHPUnit\Framework\Assert;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -38,9 +39,9 @@ class ConnectionCompilerPassTest extends \Matthias\SymfonyDependencyInjectionTes
 		$setLoggerCall = $this->container->findDefinition(
 			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_SERVICE_DATABASE_CONNECTION
 		)->getMethodCalls()[0];
-		$this->assertSame('setLogger', $setLoggerCall[0]);
-		$this->assertInstanceOf(Reference::class, $setLoggerCall[1][0]);
-		$this->assertSame(
+		Assert::assertSame('setLogger', $setLoggerCall[0]);
+		Assert::assertInstanceOf(Reference::class, $setLoggerCall[1][0]);
+		Assert::assertSame(
 			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_SERVICE_LOGGER,
 			$setLoggerCall[1][0]->__toString()
 		);
@@ -68,7 +69,7 @@ class ConnectionCompilerPassTest extends \Matthias\SymfonyDependencyInjectionTes
 			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_SERVICE_DATABASE_CONNECTION
 		)->getMethodCalls();
 		foreach ($methodCalls as $methodCall) {
-			$this->assertNotSame('setLogger', $methodCall[0]);
+			Assert::assertNotSame('setLogger', $methodCall[0]);
 		}
 	}
 

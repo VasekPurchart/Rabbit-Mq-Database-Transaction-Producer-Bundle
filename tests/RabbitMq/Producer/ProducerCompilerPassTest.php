@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\RabbitMq\Producer;
 
 use OldSound\RabbitMqBundle\RabbitMq\Producer;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -47,8 +48,8 @@ class ProducerCompilerPassTest extends \Matthias\SymfonyDependencyInjectionTest\
 		$originalProducerArgument = $this->container->findDefinition(
 			'old_sound_rabbit_mq.availability_generate_premise_producer'
 		)->getArgument(0);
-		$this->assertInstanceOf(Reference::class, $originalProducerArgument);
-		$this->assertSame(
+		Assert::assertInstanceOf(Reference::class, $originalProducerArgument);
+		Assert::assertSame(
 			'old_sound_rabbit_mq.availability_generate_premise_producer.original',
 			$originalProducerArgument->__toString()
 		);
@@ -60,8 +61,8 @@ class ProducerCompilerPassTest extends \Matthias\SymfonyDependencyInjectionTest\
 		$connectionArgument = $this->container->findDefinition(
 			'old_sound_rabbit_mq.availability_generate_premise_producer'
 		)->getArgument(1);
-		$this->assertInstanceOf(Reference::class, $connectionArgument);
-		$this->assertSame(
+		Assert::assertInstanceOf(Reference::class, $connectionArgument);
+		Assert::assertSame(
 			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_SERVICE_DATABASE_CONNECTION,
 			$connectionArgument->__toString()
 		);
