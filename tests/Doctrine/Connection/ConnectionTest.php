@@ -14,13 +14,13 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 	{
 		$connection = $this->getConnection();
 
-		$loggerMock = $this->getLoggerMock();
+		$loggerMock = $this->createMock(LoggerInterface::class);
 		$loggerMock
 			->expects($this->never())
 			->method('error');
 		$connection->setLogger($loggerMock);
 
-		$mock = $this->getCallbacksMock();
+		$mock = $this->createMock(DummyCallbacks::class);
 		$mock
 			->expects($this->once())
 			->method('callback1');
@@ -42,13 +42,13 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 	{
 		$connection = $this->getConnection();
 
-		$loggerMock = $this->getLoggerMock();
+		$loggerMock = $this->createMock(LoggerInterface::class);
 		$loggerMock
 			->expects($this->never())
 			->method('error');
 		$connection->setLogger($loggerMock);
 
-		$mock = $this->getCallbacksMock();
+		$mock = $this->createMock(DummyCallbacks::class);
 		$mock
 			->expects($this->never())
 			->method('callback1');
@@ -70,13 +70,13 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 	{
 		$connection = $this->getConnection();
 
-		$loggerMock = $this->getLoggerMock();
+		$loggerMock = $this->createMock(LoggerInterface::class);
 		$loggerMock
 			->expects($this->never())
 			->method('error');
 		$connection->setLogger($loggerMock);
 
-		$mock = $this->getCallbacksMock();
+		$mock = $this->createMock(DummyCallbacks::class);
 		$mock
 			->expects($this->once())
 			->method('callback1');
@@ -104,13 +104,13 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 	{
 		$connection = $this->getConnection();
 
-		$loggerMock = $this->getLoggerMock();
+		$loggerMock = $this->createMock(LoggerInterface::class);
 		$loggerMock
 			->expects($this->never())
 			->method('error');
 		$connection->setLogger($loggerMock);
 
-		$mock = $this->getCallbacksMock();
+		$mock = $this->createMock(DummyCallbacks::class);
 		$mock
 			->expects($this->never())
 			->method('callback1');
@@ -138,13 +138,13 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 	{
 		$connection = $this->getConnection();
 
-		$loggerMock = $this->getLoggerMock();
+		$loggerMock = $this->createMock(LoggerInterface::class);
 		$loggerMock
 			->expects($this->never())
 			->method('error');
 		$connection->setLogger($loggerMock);
 
-		$mock = $this->getCallbacksMock();
+		$mock = $this->createMock(DummyCallbacks::class);
 		$mock
 			->expects($this->never())
 			->method('callback1');
@@ -175,7 +175,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 	{
 		$connection = $this->getConnection();
 
-		$loggerMock = $this->getLoggerMock();
+		$loggerMock = $this->createMock(LoggerInterface::class);
 		$loggerMock
 			->expects($this->once())
 			->method('error')
@@ -204,7 +204,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 	{
 		$connection = $this->getConnection();
 
-		$mock = $this->getCallbacksMock();
+		$mock = $this->createMock(DummyCallbacks::class);
 		$mock
 			->expects($this->never())
 			->method('callback1');
@@ -224,7 +224,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 	{
 		$connection = $this->getConnection();
 
-		$loggerMock = $this->getLoggerMock();
+		$loggerMock = $this->createMock(LoggerInterface::class);
 		$loggerMock
 			->expects($this->never())
 			->method('error');
@@ -240,22 +240,6 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 	private function getConnection(): Connection
 	{
 		return new Connection(['path' => ':memory:'], new PDOSqliteDriver());
-	}
-
-	/**
-	 * @return \VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection\DummyCallbacks|\PHPUnit_Framework_MockObject_MockObject
-	 */
-	private function getCallbacksMock(): DummyCallbacks
-	{
-		return $this->createMock(DummyCallbacks::class);
-	}
-
-	/**
-	 * @return \Psr\Log\LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
-	 */
-	private function getLoggerMock(): LoggerInterface
-	{
-		return $this->createMock(LoggerInterface::class);
 	}
 
 }
