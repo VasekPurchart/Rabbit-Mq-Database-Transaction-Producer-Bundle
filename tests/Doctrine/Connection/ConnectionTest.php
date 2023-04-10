@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection;
 
 use Doctrine\DBAL\Driver\PDO\SQLite\Driver as PDOSqliteDriver;
+use PHPUnit\Framework\Assert;
 use Psr\Log\LoggerInterface;
 
 class ConnectionTest extends \PHPUnit\Framework\TestCase
@@ -16,13 +17,13 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 
 		$loggerMock = $this->createMock(LoggerInterface::class);
 		$loggerMock
-			->expects($this->never())
+			->expects(self::never())
 			->method('error');
 		$connection->setLogger($loggerMock);
 
 		$mock = $this->createMock(DummyCallbacks::class);
 		$mock
-			->expects($this->once())
+			->expects(self::once())
 			->method('callback1');
 
 		$connection->addAfterCommitCallback(function () use ($mock): void {
@@ -44,13 +45,13 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 
 		$loggerMock = $this->createMock(LoggerInterface::class);
 		$loggerMock
-			->expects($this->never())
+			->expects(self::never())
 			->method('error');
 		$connection->setLogger($loggerMock);
 
 		$mock = $this->createMock(DummyCallbacks::class);
 		$mock
-			->expects($this->never())
+			->expects(self::never())
 			->method('callback1');
 
 		$connection->addAfterCommitCallback(function () use ($mock): void {
@@ -72,16 +73,16 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 
 		$loggerMock = $this->createMock(LoggerInterface::class);
 		$loggerMock
-			->expects($this->never())
+			->expects(self::never())
 			->method('error');
 		$connection->setLogger($loggerMock);
 
 		$mock = $this->createMock(DummyCallbacks::class);
 		$mock
-			->expects($this->once())
+			->expects(self::once())
 			->method('callback1');
 		$mock
-			->expects($this->once())
+			->expects(self::once())
 			->method('callback2');
 
 		$connection->addAfterCommitCallback(function () use ($mock): void {
@@ -106,16 +107,16 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 
 		$loggerMock = $this->createMock(LoggerInterface::class);
 		$loggerMock
-			->expects($this->never())
+			->expects(self::never())
 			->method('error');
 		$connection->setLogger($loggerMock);
 
 		$mock = $this->createMock(DummyCallbacks::class);
 		$mock
-			->expects($this->never())
+			->expects(self::never())
 			->method('callback1');
 		$mock
-			->expects($this->never())
+			->expects(self::never())
 			->method('callback2');
 
 		$connection->addAfterCommitCallback(function () use ($mock): void {
@@ -140,13 +141,13 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 
 		$loggerMock = $this->createMock(LoggerInterface::class);
 		$loggerMock
-			->expects($this->never())
+			->expects(self::never())
 			->method('error');
 		$connection->setLogger($loggerMock);
 
 		$mock = $this->createMock(DummyCallbacks::class);
 		$mock
-			->expects($this->never())
+			->expects(self::never())
 			->method('callback1');
 
 		$connection->addAfterCommitCallback(function () use ($mock): void {
@@ -160,14 +161,14 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 		$connection->beginTransaction();
 		$connection->rollBack();
 
-		$this->assertTrue($connection->isRollbackOnly());
+		Assert::assertTrue($connection->isRollbackOnly());
 
 		// outer transaction
 		$connection->rollBack();
 
 		// callbacks should be already cleared
 		$connection->beginTransaction();
-		$this->assertFalse($connection->isRollbackOnly());
+		Assert::assertFalse($connection->isRollbackOnly());
 		$connection->commit();
 	}
 
@@ -177,13 +178,13 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 
 		$loggerMock = $this->createMock(LoggerInterface::class);
 		$loggerMock
-			->expects($this->once())
+			->expects(self::once())
 			->method('error')
 			->with(
-				$this->callback(function ($message): bool {
+				Assert::callback(function ($message): bool {
 					return strpos($message, 'callback failed') !== false;
 				}),
-				$this->callback(function ($data): bool {
+				Assert::callback(function ($data): bool {
 					return ($data['exception'] instanceof \Exception)
 						&& $data['exception']->getMessage() === 'callback failed';
 				})
@@ -197,7 +198,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 		$connection->beginTransaction();
 		$connection->commit();
 
-		$this->assertTrue(true, 'callback exception was properly caught');
+		Assert::assertTrue(true, 'callback exception was properly caught');
 	}
 
 	public function testMissingLogger(): void
@@ -206,7 +207,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 
 		$mock = $this->createMock(DummyCallbacks::class);
 		$mock
-			->expects($this->never())
+			->expects(self::never())
 			->method('callback1');
 
 		$this->expectException(
@@ -217,7 +218,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 			$mock->callback1();
 		});
 
-		$this->fail();
+		Assert::fail();
 	}
 
 	public function testSetLoggerOnlyOnce(): void
@@ -226,7 +227,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 
 		$loggerMock = $this->createMock(LoggerInterface::class);
 		$loggerMock
-			->expects($this->never())
+			->expects(self::never())
 			->method('error');
 		$connection->setLogger($loggerMock);
 

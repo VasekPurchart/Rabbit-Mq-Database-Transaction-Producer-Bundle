@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection\Connection;
@@ -45,10 +46,10 @@ class RabbitMqDatabaseTransactionProducerExtensionTest extends \Matthias\Symfony
 
 		$doctrineConfig = $this->container->getExtensionConfig('doctrine');
 		if (!isset($doctrineConfig[0]) || !isset($doctrineConfig[0]['dbal']) || !isset($doctrineConfig[0]['dbal']['wrapper_class'])) {
-			$this->fail();
+			Assert::fail();
 		}
 
-		$this->assertSame(Connection::class, $doctrineConfig[0]['dbal']['wrapper_class']);
+		Assert::assertSame(Connection::class, $doctrineConfig[0]['dbal']['wrapper_class']);
 	}
 
 	public function testLoadExtension(): void
