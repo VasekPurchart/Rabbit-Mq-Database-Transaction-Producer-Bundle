@@ -6,6 +6,7 @@ namespace VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\RabbitMq\Produ
 
 use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
 use OldSound\RabbitMqBundle\RabbitMq\Producer;
+use PHPUnit\Framework\Assert;
 use Psr\Log\LoggerInterface;
 use VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection\Connection;
 
@@ -24,9 +25,9 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 			->disableOriginalConstructor()
 			->getMock();
 		$originalProducer
-			->expects($this->once())
+			->expects(self::once())
 			->method('publish')
-			->with($this->callback(function ($receivedMessage) use ($message, &$wasAlreadyPublished) {
+			->with(Assert::callback(function ($receivedMessage) use ($message, &$wasAlreadyPublished) {
 				$wasAlreadyPublished = true;
 
 				return $receivedMessage === $message;
@@ -35,9 +36,9 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 		$databaseTransactionProducer = new DatabaseTransactionProducer($originalProducer, $connection);
 
 		$connection->query('SELECT 1');
-		$this->assertFalse($wasAlreadyPublished);
+		Assert::assertFalse($wasAlreadyPublished);
 		$databaseTransactionProducer->publish($message);
-		$this->assertTrue($wasAlreadyPublished);
+		Assert::assertTrue($wasAlreadyPublished);
 	}
 
 	public function testMessageIsSentAfterTransaction(): void
@@ -52,9 +53,9 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 			->disableOriginalConstructor()
 			->getMock();
 		$originalProducer
-			->expects($this->once())
+			->expects(self::once())
 			->method('publish')
-			->with($this->callback(function ($receivedMessage) use ($message, &$wasAlreadyPublished) {
+			->with(Assert::callback(function ($receivedMessage) use ($message, &$wasAlreadyPublished) {
 				$wasAlreadyPublished = true;
 
 				return $receivedMessage === $message;
@@ -70,11 +71,11 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 			&$wasAlreadyPublished
 		): void {
 			$connection->query('SELECT 1');
-			$this->assertFalse($wasAlreadyPublished);
+			Assert::assertFalse($wasAlreadyPublished);
 			$databaseTransactionProducer->publish($message);
-			$this->assertFalse($wasAlreadyPublished);
+			Assert::assertFalse($wasAlreadyPublished);
 		});
-		$this->assertTrue($wasAlreadyPublished);
+		Assert::assertTrue($wasAlreadyPublished);
 	}
 
 	public function testMessageIsNeverSentIfTransactionIsNotCompleted(): void
@@ -88,7 +89,7 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 			->disableOriginalConstructor()
 			->getMock();
 		$originalProducer
-			->expects($this->never())
+			->expects(self::never())
 			->method('publish');
 
 		$databaseTransactionProducer = new DatabaseTransactionProducer($originalProducer, $connection);
@@ -110,9 +111,9 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 			->disableOriginalConstructor()
 			->getMock();
 		$originalProducer
-			->expects($this->once())
+			->expects(self::once())
 			->method('publish')
-			->with($this->callback(function ($receivedMessage) use ($message, &$wasAlreadyPublished) {
+			->with(Assert::callback(function ($receivedMessage) use ($message, &$wasAlreadyPublished) {
 				$wasAlreadyPublished = true;
 
 				return $receivedMessage === $message;
@@ -122,14 +123,14 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 
 		$connection->beginTransaction();
 		$connection->query('SELECT 1');
-		$this->assertFalse($wasAlreadyPublished);
+		Assert::assertFalse($wasAlreadyPublished);
 		$databaseTransactionProducer->publish('throw-away-message');
-		$this->assertFalse($wasAlreadyPublished);
+		Assert::assertFalse($wasAlreadyPublished);
 		$connection->rollBack();
-		$this->assertFalse($wasAlreadyPublished);
+		Assert::assertFalse($wasAlreadyPublished);
 
 		$databaseTransactionProducer->publish($message);
-		$this->assertTrue($wasAlreadyPublished);
+		Assert::assertTrue($wasAlreadyPublished);
 	}
 
 	private function getConnection(): Connection
