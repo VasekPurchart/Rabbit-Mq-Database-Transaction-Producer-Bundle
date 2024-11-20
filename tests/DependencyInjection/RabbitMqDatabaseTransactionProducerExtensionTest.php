@@ -5,6 +5,8 @@ declare(strict_types = 1);
 namespace VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\DependencyInjection;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\DoctrineExtension;
+use Generator;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection\Connection;
@@ -45,33 +47,52 @@ class RabbitMqDatabaseTransactionProducerExtensionTest extends \Matthias\Symfony
 
 		$doctrineConfig = $this->container->getExtensionConfig('doctrine');
 		if (!isset($doctrineConfig[0]) || !isset($doctrineConfig[0]['dbal']) || !isset($doctrineConfig[0]['dbal']['wrapper_class'])) {
-			$this->fail();
+			Assert::fail();
 		}
 
-		$this->assertSame(Connection::class, $doctrineConfig[0]['dbal']['wrapper_class']);
+		Assert::assertSame(Connection::class, $doctrineConfig[0]['dbal']['wrapper_class']);
 	}
 
-	public function testLoadExtension(): void
+	/**
+	 * @return mixed[][]|\Generator
+	 */
+	public function configureContainerParameterDataProvider(): Generator
 	{
-		$this->loadExtensions();
+		yield 'default connection integration' => [
+			'configuration' => [],
+			'parameterName' => RabbitMqDatabaseTransactionProducerExtension::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS,
+			'expectedParameterValue' => false,
+		];
 
-		$this->assertContainerBuilderHasParameter(
-			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS,
-			false
-		);
-	}
-
-	public function testTurnOffDefaultConnectionIntegration(): void
-	{
-		$this->loadExtensions([
-			'rabbit_mq_database_transaction_producer' => [
-				'custom_connection_class' => true,
+		yield 'turn off default connection integration' => [
+			'configuration' => [
+				'rabbit_mq_database_transaction_producer' => [
+					'custom_connection_class' => true,
+				],
 			],
-		]);
+			'parameterName' => RabbitMqDatabaseTransactionProducerExtension::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS,
+			'expectedParameterValue' => true,
+		];
+	}
+
+	/**
+	 * @dataProvider configureContainerParameterDataProvider
+	 *
+	 * @param mixed[][] $configuration
+	 * @param string $parameterName
+	 * @param bool $expectedParameterValue
+	 */
+	public function testConfigureContainerParameter(
+		array $configuration,
+		string $parameterName,
+		bool $expectedParameterValue
+	): void
+	{
+		$this->loadExtensions($configuration);
 
 		$this->assertContainerBuilderHasParameter(
-			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS,
-			true
+			$parameterName,
+			$expectedParameterValue
 		);
 	}
 
