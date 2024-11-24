@@ -26,7 +26,7 @@ class ConnectionCompilerPassTest extends \Matthias\SymfonyDependencyInjectionTes
 			$connectionDefinition
 		);
 		$this->setParameter(
-			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS,
+			'rabbit_mq_database_transaction_producer_bundle.custom_connection_class',
 			false
 		);
 
@@ -55,7 +55,7 @@ class ConnectionCompilerPassTest extends \Matthias\SymfonyDependencyInjectionTes
 			$connectionDefinition
 		);
 		$this->setParameter(
-			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS,
+			'rabbit_mq_database_transaction_producer_bundle.custom_connection_class',
 			true
 		);
 

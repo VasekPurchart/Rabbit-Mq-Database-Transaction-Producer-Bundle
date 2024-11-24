@@ -16,8 +16,6 @@ class RabbitMqDatabaseTransactionProducerExtension
 
 	public const ALIAS = 'rabbit_mq_database_transaction_producer';
 
-	public const CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS = 'rabbit_mq_database_transaction_producer_bundle.custom_connection_class';
-
 	public const CONTAINER_SERVICE_DATABASE_CONNECTION = 'rabbit_mq_database_transaction_producer_bundle.database_connection';
 	public const CONTAINER_SERVICE_LOGGER = 'rabbit_mq_database_transaction_producer_bundle.logger';
 
@@ -47,7 +45,7 @@ class RabbitMqDatabaseTransactionProducerExtension
 	protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void
 	{
 		$container->setParameter(
-			self::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS,
+			'rabbit_mq_database_transaction_producer_bundle.custom_connection_class',
 			$mergedConfig[Configuration::PARAMETER_CUSTOM_CONNECTION_CLASS]
 		);
 

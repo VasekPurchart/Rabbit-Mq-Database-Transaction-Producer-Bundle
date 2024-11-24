@@ -60,7 +60,7 @@ class RabbitMqDatabaseTransactionProducerExtensionTest extends \Matthias\Symfony
 	{
 		yield 'default connection integration' => [
 			'configuration' => [],
-			'parameterName' => RabbitMqDatabaseTransactionProducerExtension::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS,
+			'parameterName' => 'rabbit_mq_database_transaction_producer_bundle.custom_connection_class',
 			'expectedParameterValue' => false,
 		];
 
@@ -70,7 +70,7 @@ class RabbitMqDatabaseTransactionProducerExtensionTest extends \Matthias\Symfony
 					'custom_connection_class' => true,
 				],
 			],
-			'parameterName' => RabbitMqDatabaseTransactionProducerExtension::CONTAINER_PARAMETER_CUSTOM_CONNECTION_CLASS,
+			'parameterName' => 'rabbit_mq_database_transaction_producer_bundle.custom_connection_class',
 			'expectedParameterValue' => true,
 		];
 	}
