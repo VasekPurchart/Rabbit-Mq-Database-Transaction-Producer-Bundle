@@ -101,7 +101,7 @@ services:
     my_logger:
         class: 'Monolog\Logger'
         arguments:
-            - 'my_channel'
+            $name: 'my_channel'
 
     rabbit_mq_database_transaction_producer_bundle.logger: '@my_logger'
 ```
