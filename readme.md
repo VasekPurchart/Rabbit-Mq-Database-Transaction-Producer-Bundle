@@ -99,11 +99,11 @@ You can also override services used internally, for example if you use a non sta
 ```yaml
 services:
     my_logger:
-        class: Monolog\Logger
+        class: 'Monolog\Logger'
         arguments:
-            - 'my_channel'
+            $name: 'my_channel'
 
-    rabbit_mq_database_transaction_producer_bundle.logger: @my_logger
+    rabbit_mq_database_transaction_producer_bundle.logger: '@my_logger'
 ```
 
 Installation

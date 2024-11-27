@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class Configuration implements \Symfony\Component\Config\Definition\ConfigurationInterface
@@ -26,15 +27,18 @@ class Configuration implements \Symfony\Component\Config\Definition\Configuratio
 		$treeBuilder = new TreeBuilder();
 		$rootNode = $treeBuilder->root($this->rootNode);
 
-		$rootNode
-			->children()
-				->booleanNode(self::PARAMETER_CUSTOM_CONNECTION_CLASS)
-					->info('Whether custom connection class for DBAL is used in the project')
-					->defaultValue(false)
-					->end()
-			->end();
+		$rootNode->children()->append($this->createCustomConnectionClassNode(self::PARAMETER_CUSTOM_CONNECTION_CLASS));
 
 		return $treeBuilder;
+	}
+
+	private function createCustomConnectionClassNode(string $nodeName): BooleanNodeDefinition
+	{
+		$node = new BooleanNodeDefinition($nodeName);
+		$node->info('Whether custom connection class for DBAL is used in the project');
+		$node->defaultValue(false);
+
+		return $node;
 	}
 
 }
