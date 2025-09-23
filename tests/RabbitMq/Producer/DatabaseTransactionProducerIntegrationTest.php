@@ -35,7 +35,7 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 
 		$databaseTransactionProducer = new DatabaseTransactionProducer($originalProducer, $connection);
 
-		$connection->query('SELECT 1');
+		$connection->executeQuery('SELECT 1');
 		Assert::assertFalse($wasAlreadyPublished);
 		$databaseTransactionProducer->publish($message);
 		Assert::assertTrue($wasAlreadyPublished);
@@ -70,7 +70,7 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 			$message,
 			&$wasAlreadyPublished
 		): void {
-			$connection->query('SELECT 1');
+			$connection->executeQuery('SELECT 1');
 			Assert::assertFalse($wasAlreadyPublished);
 			$databaseTransactionProducer->publish($message);
 			Assert::assertFalse($wasAlreadyPublished);
@@ -95,7 +95,7 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 		$databaseTransactionProducer = new DatabaseTransactionProducer($originalProducer, $connection);
 
 		$connection->beginTransaction();
-		$connection->query('SELECT 1');
+		$connection->executeQuery('SELECT 1');
 		$databaseTransactionProducer->publish($message);
 	}
 
@@ -122,7 +122,7 @@ class DatabaseTransactionProducerIntegrationTest extends \PHPUnit\Framework\Test
 		$databaseTransactionProducer = new DatabaseTransactionProducer($originalProducer, $connection);
 
 		$connection->beginTransaction();
-		$connection->query('SELECT 1');
+		$connection->executeQuery('SELECT 1');
 		Assert::assertFalse($wasAlreadyPublished);
 		$databaseTransactionProducer->publish('throw-away-message');
 		Assert::assertFalse($wasAlreadyPublished);
