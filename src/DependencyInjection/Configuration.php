@@ -24,8 +24,8 @@ class Configuration implements \Symfony\Component\Config\Definition\Configuratio
 
 	public function getConfigTreeBuilder(): TreeBuilder
 	{
-		$treeBuilder = new TreeBuilder();
-		$rootNode = $treeBuilder->root($this->rootNode);
+		$treeBuilder = new TreeBuilder($this->rootNode);
+		$rootNode = $treeBuilder->getRootNode();
 
 		$rootNode->children()->append($this->createCustomConnectionClassNode(self::PARAMETER_CUSTOM_CONNECTION_CLASS));
 
