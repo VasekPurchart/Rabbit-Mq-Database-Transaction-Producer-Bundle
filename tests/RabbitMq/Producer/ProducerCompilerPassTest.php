@@ -8,63 +8,134 @@ use OldSound\RabbitMqBundle\RabbitMq\Producer;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\DependencyInjection\RabbitMqDatabaseTransactionProducerExtension;
 
-class ProducerCompilerPassTest extends \Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractCompilerPassTestCase
+class ProducerCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-
-	protected function registerCompilerPass(ContainerBuilder $container): void
-	{
-		$container->addCompilerPass(new ProducerCompilerPass());
-	}
 
 	public function testWrapProducersWithDatabaseTransactionProducer(): void
 	{
+		$container = self::createContainer();
+		$container->addCompilerPass(new ProducerCompilerPass());
+
 		$producerDefinition = new Definition(Producer::class);
 		$producerDefinition->addTag(ProducerCompilerPass::RABBIT_MQ_EXTENSION_PRODUCER_TAG);
-		$this->setDefinition('old_sound_rabbit_mq.availability_generate_premise_producer', $producerDefinition);
 
-		$this->compile();
+		$serviceId = 'old_sound_rabbit_mq.availability_generate_premise_producer';
+		$container->setDefinition($serviceId, $producerDefinition);
 
-		$this->assertContainerBuilderHasService(
-			'old_sound_rabbit_mq.availability_generate_premise_producer.original',
-			Producer::class
-		);
-		$this->assertContainerBuilderHasServiceDefinitionWithTag(
-			'old_sound_rabbit_mq.availability_generate_premise_producer.original',
+		$container->compile();
+
+		$originalServiceId = 'old_sound_rabbit_mq.availability_generate_premise_producer.original';
+		self::assertContainerHasService($container, $originalServiceId);
+		self::assertContainerServiceIsOfType($container, $originalServiceId, Producer::class);
+
+		self::assertContainerServiceHasTag(
+			$container,
+			$originalServiceId,
 			ProducerCompilerPass::RABBIT_MQ_EXTENSION_PRODUCER_TAG
 		);
 
-		$this->assertContainerBuilderHasService(
-			'old_sound_rabbit_mq.availability_generate_premise_producer',
-			DatabaseTransactionProducer::class
-		);
+		self::assertContainerHasService($container, $serviceId);
+		self::assertContainerServiceIsOfType($container, $serviceId, DatabaseTransactionProducer::class);
 
-		$this->assertContainerBuilderHasServiceDefinitionWithArgument(
-			'old_sound_rabbit_mq.availability_generate_premise_producer',
-			0
-		);
-		$originalProducerArgument = $this->container->findDefinition(
-			'old_sound_rabbit_mq.availability_generate_premise_producer'
+		self::assertContainerServiceHasArgument($container, $serviceId, 0);
+		$originalProducerArgument = $container->findDefinition(
+			$serviceId
 		)->getArgument(0);
 		Assert::assertInstanceOf(Reference::class, $originalProducerArgument);
 		Assert::assertSame(
-			'old_sound_rabbit_mq.availability_generate_premise_producer.original',
+			$originalServiceId,
 			$originalProducerArgument->__toString()
 		);
 
-		$this->assertContainerBuilderHasServiceDefinitionWithArgument(
-			'old_sound_rabbit_mq.availability_generate_premise_producer',
-			1
-		);
-		$connectionArgument = $this->container->findDefinition(
-			'old_sound_rabbit_mq.availability_generate_premise_producer'
+		self::assertContainerServiceHasArgument($container, $serviceId, 1);
+		$connectionArgument = $container->findDefinition(
+			$serviceId
 		)->getArgument(1);
 		Assert::assertInstanceOf(Reference::class, $connectionArgument);
 		Assert::assertSame(
 			RabbitMqDatabaseTransactionProducerExtension::CONTAINER_SERVICE_DATABASE_CONNECTION,
 			$connectionArgument->__toString()
+		);
+	}
+
+	public static function createContainer(): ContainerBuilder
+	{
+		$container = new ContainerBuilder(new ParameterBag([]));
+		$container->getCompilerPassConfig()->setOptimizationPasses([]);
+		$container->getCompilerPassConfig()->setRemovingPasses([]);
+		$container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+
+		return $container;
+	}
+
+	private static function assertContainerHasService(
+		ContainerBuilder $container,
+		string $serviceId
+	): void
+	{
+		Assert::assertTrue(
+			$container->has($serviceId),
+			sprintf('Expecting the container to have service `%s`.', $serviceId)
+		);
+	}
+
+	private static function assertContainerServiceIsOfType(
+		ContainerBuilder $container,
+		string $serviceId,
+		string $expectedClassString
+	): void
+	{
+		$serviceDefinition = $container->findDefinition($serviceId);
+
+		Assert::assertSame(
+			$expectedClassString,
+			$container->getParameterBag()->resolveValue($serviceDefinition->getClass()),
+			sprintf('Expecting the service `%s` to be of type `%s`.', $serviceId, $expectedClassString)
+		);
+	}
+
+	/**
+	 * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+	 * @param string $serviceId
+	 * @param int|string $argumentIndex
+	 */
+	private static function assertContainerServiceHasArgument(
+		ContainerBuilder $container,
+		string $serviceId,
+		$argumentIndex
+	): void
+	{
+		$serviceDefinition = $container->findDefinition($serviceId);
+
+		try {
+			$serviceDefinition->getArgument($argumentIndex);
+		} catch (\Symfony\Component\DependencyInjection\Exception\OutOfBoundsException $exception) {
+			Assert::fail(
+				sprintf(
+					'Expecting the service `%s` to have %s argument `%s`.',
+					$serviceId,
+					is_string($argumentIndex) ? 'string' : 'integer',
+					$argumentIndex
+				)
+			);
+		}
+	}
+
+	private static function assertContainerServiceHasTag(
+		ContainerBuilder $container,
+		string $serviceId,
+		string $tagName
+	): void
+	{
+		$serviceDefinition = $container->findDefinition($serviceId);
+
+		Assert::assertTrue(
+			$serviceDefinition->hasTag($tagName),
+			sprintf('Expecting the service `%s` to have tag `%s`.', $serviceId, $tagName)
 		);
 	}
 

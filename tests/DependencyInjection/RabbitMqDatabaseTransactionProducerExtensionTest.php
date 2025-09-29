@@ -9,44 +9,35 @@ use Generator;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\Doctrine\Connection\Connection;
 
-class RabbitMqDatabaseTransactionProducerExtensionTest extends \Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractExtensionTestCase
+class RabbitMqDatabaseTransactionProducerExtensionTest extends \PHPUnit\Framework\TestCase
 {
-
-	public function setUp(): void
-	{
-		parent::setUp();
-		$this->setParameter('kernel.debug', true);
-	}
-
-	/**
-	 * @return \Symfony\Component\DependencyInjection\Extension\ExtensionInterface[]
-	 */
-	protected function getContainerExtensions(): array
-	{
-		return [
-			new DoctrineExtension(),
-			new RabbitMqDatabaseTransactionProducerExtension(),
-		];
-	}
 
 	public function testDependsOnDoctrineBundle(): void
 	{
-		$containerBuilder = new ContainerBuilder();
+		$container = self::createContainer();
+		$container->setParameter('kernel.debug', true);
 		$extension = new RabbitMqDatabaseTransactionProducerExtension();
 		$this->expectException(
 			\VasekPurchart\RabbitMqDatabaseTransactionProducerBundle\DependencyInjection\DoctrineExtensionNotFoundException::class
 		);
-		$extension->prepend($containerBuilder);
+		$extension->prepend($container);
 	}
 
 	public function testRegisterCustomConnectionClass(): void
 	{
-		$this->loadExtensions();
+		$container = self::createContainer();
+		$container->setParameter('kernel.debug', true);
+		$container->registerExtension(new DoctrineExtension());
+		$container->registerExtension(new RabbitMqDatabaseTransactionProducerExtension());
 
-		$doctrineConfig = $this->container->getExtensionConfig('doctrine');
-		if (!isset($doctrineConfig[0]) || !isset($doctrineConfig[0]['dbal']) || !isset($doctrineConfig[0]['dbal']['wrapper_class'])) {
+		self::loadRegisteredExtensionsUsingConfigurationByAlias($container);
+
+		$doctrineConfig = $container->getExtensionConfig('doctrine');
+		if (!isset($doctrineConfig[0]) || !isset($doctrineConfig[0]['dbal'])
+			|| !isset($doctrineConfig[0]['dbal']['wrapper_class'])) {
 			Assert::fail();
 		}
 
@@ -78,7 +69,7 @@ class RabbitMqDatabaseTransactionProducerExtensionTest extends \Matthias\Symfony
 	/**
 	 * @dataProvider configureContainerParameterDataProvider
 	 *
-	 * @param mixed[][] $configuration
+	 * @param mixed[][]|array $configuration
 	 * @param string $parameterName
 	 * @param bool $expectedParameterValue
 	 */
@@ -88,39 +79,60 @@ class RabbitMqDatabaseTransactionProducerExtensionTest extends \Matthias\Symfony
 		bool $expectedParameterValue
 	): void
 	{
-		$this->loadExtensions($configuration);
+		$container = self::createContainer();
+		$container->setParameter('kernel.debug', true);
+		$container->registerExtension(new DoctrineExtension());
+		$container->registerExtension(new RabbitMqDatabaseTransactionProducerExtension());
 
-		$this->assertContainerBuilderHasParameter(
-			$parameterName,
-			$expectedParameterValue
-		);
+		self::loadRegisteredExtensionsUsingConfigurationByAlias($container, $configuration);
+
+		self::assertContainerHasParameter($container, $parameterName);
+		Assert::assertSame($expectedParameterValue, $container->getParameter($parameterName));
+	}
+
+	private static function createContainer(): ContainerBuilder
+	{
+		$container = new ContainerBuilder(new ParameterBag([]));
+		$container->getCompilerPassConfig()->setOptimizationPasses([]);
+		$container->getCompilerPassConfig()->setRemovingPasses([]);
+		$container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+
+		return $container;
 	}
 
 	/**
-	 * @param mixed[] $configuration format: extensionAlias(string) => configuration(mixed[])
+	 * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+	 * @param mixed[][]|array $configurationsByAlias format: extensionAlias(string) => configuration(mixed[])
 	 */
-	private function loadExtensions(array $configuration = []): void
+	private static function loadRegisteredExtensionsUsingConfigurationByAlias(
+		ContainerBuilder $container,
+		array $configurationsByAlias = []
+	): void
 	{
-		$configurations = [];
-		foreach ($this->container->getExtensions() as $extensionAlias => $extension) {
-			$configurations[$extensionAlias] = [];
-			if (array_key_exists($extensionAlias, $this->getMinimalConfiguration())) {
-				$this->container->loadFromExtension($extensionAlias, $this->getMinimalConfiguration()[$extensionAlias]);
-				$configurations[$extensionAlias][] = $this->getMinimalConfiguration()[$extensionAlias];
-			}
-			if (array_key_exists($extensionAlias, $configuration)) {
-				$this->container->loadFromExtension($extensionAlias, $configuration[$extensionAlias]);
-				$configurations[$extensionAlias][] = $configuration[$extensionAlias];
-			}
-		}
-		foreach ($this->container->getExtensions() as $extensionAlias => $extension) {
+		foreach ($container->getExtensions() as $extension) {
 			if ($extension instanceof PrependExtensionInterface) {
-				$extension->prepend($this->container);
+				$extension->prepend($container);
 			}
 		}
-		foreach ($this->container->getExtensions() as $extensionAlias => $extension) {
-			$extension->load($configurations[$extensionAlias], $this->container);
+
+		foreach ($container->getExtensions() as $extensionAlias => $extension) {
+			if (array_key_exists($extensionAlias, $configurationsByAlias)) {
+				$extension->load([$configurationsByAlias[$extensionAlias]], $container);
+			} else {
+				$extension->load([], $container);
+			}
 		}
+	}
+
+	private static function assertContainerHasParameter(
+		ContainerBuilder $container,
+		string $parameterName
+	): void
+	{
+		Assert::assertTrue(
+			$container->hasParameter($parameterName),
+			sprintf('Expecting the container to have parameter `%s`.', $parameterName)
+		);
 	}
 
 }
